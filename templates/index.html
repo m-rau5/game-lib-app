@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Game Library App</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="center-block">
+      <h1>Welcome to Game Library App!</h1>
+      <p>Login with Google to start managing your games!</p>
+      <input
+        type="button"
+        value="Login with Google"
+        onclick="window.location.href = '{{url_for('login')}}'"
+      />
+    </div>
+  </body>
+</html>

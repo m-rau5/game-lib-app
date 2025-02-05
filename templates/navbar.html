@@ -1,0 +1,30 @@
+<nav class="navbar">
+  <!-- Home Link -->
+  <div class="navbar-section navbar-left">
+    <a href="{{ url_for('homePage') }}" class="nav-link">Home</a>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="navbar-section navbar-center">
+    <form action="{{ url_for('search') }}" method="GET" class="search-form">
+      <input type="text" name="query" placeholder="Search..." required />
+      <select name="category">
+        <option value="games">Games</option>
+        <option value="users">Users</option>
+      </select>
+      <button type="submit">Go</button>
+    </form>
+  </div>
+
+  <!-- Profile & Logout Links -->
+  <div class="navbar-section navbar-right">
+    {% if session.get('user') %}
+    <a
+      href="{{ url_for('users.user_profile', username=session['user']['username']) }}"
+      class="nav-link"
+      >Profile</a
+    >
+    <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+    {% endif %}
+  </div>
+</nav>
