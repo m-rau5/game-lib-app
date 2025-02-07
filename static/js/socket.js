@@ -1,4 +1,5 @@
-const socket = io.connect("http://localhost:5000");
+// const socket = io.connect("http://localhost:5000");
+const socket = io.connect("https://game-lib-app.onrender.com");
 
 // Log connection
 socket.on("connect", () => {
