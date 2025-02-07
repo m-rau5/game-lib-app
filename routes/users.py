@@ -16,20 +16,18 @@ def init_db():
     usersCol = db['Users']
 
 
-@users_bp.route('/add', methods=['POST'])
-def add_user():
-    data = request.get_json()
-    username = data.get('username')
-    email = data.get('email')   # emails are unique since we login usig google
-
+def add_user(username, email):
     if not username or not email:
-        return jsonify({"error": "Username and email are required"}), 400
+        return False
+        # return jsonify({"error": "Username and email are required"}), 400
 
     if usersCol.find_one({"email": email}):
-        return jsonify({"message": "User with this email already exists"}), 400
+        return False
+        # return jsonify({"message": "User with this email already exists"}), 400
 
     if usersCol.find_one({"username": username}):
-        return jsonify({"message": "Username already taken."}), 400
+        return False
+        # return jsonify({"message": "Username already taken."}), 400
 
     user = {
         "username": username,
@@ -45,7 +43,7 @@ def add_user():
     }
 
     usersCol.insert_one(user)
-    return jsonify({"message": f"User {username} added successfully!"}), 201
+    return user.get("profile")
 
 
 # Get user profile by username
@@ -101,3 +99,49 @@ def change_username():
     session.modified = True  # force-recognize the session change
 
     return jsonify({"success": True, "message": "Username updated successfully"})
+
+
+@users_bp.route("/update_wishlist", methods=["POST"])
+def update_wishlist():
+    if "user" not in session:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+
+    data = request.json
+    # make string preemptively since thats how we store it
+    gameId = str(data.get("game_id"))
+
+    if not gameId:
+        return jsonify({"success": False, "message": "Invalid game ID"}), 400
+
+    username = session["user"]["username"]
+
+    # get user profile
+    user = usersCol.find_one({"username": username})
+    if not user:
+        return jsonify({"success": False, "message": "User not found"}), 404
+
+    # check in wishlist AND in session's wishlist
+    wishlist = user["profile"].get("wishlist", [])
+    sessionWishlist = session['user'].get('profile', {}).get('wishlist', [])
+    # print(sessionWishlist)
+
+    if gameId in wishlist:
+        # remove from wishlist
+        usersCol.update_one(
+            {"username": username},
+            {"$pull": {"profile.wishlist": gameId}}
+        )
+        if gameId in sessionWishlist:
+            sessionWishlist.remove(gameId)
+            session.modified = True
+        return jsonify({"success": True, "message": "Game removed from wishlist", "in_wishlist": False})
+    else:
+        # add to wishlist
+        usersCol.update_one(
+            {"username": username},
+            {"$push": {"profile.wishlist": gameId}}
+        )
+        if gameId not in sessionWishlist:
+            sessionWishlist.append(gameId)
+            session.modified = True
+        return jsonify({"success": True, "message": "Game added to wishlist", "in_wishlist": True})

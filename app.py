@@ -4,7 +4,7 @@ from config import Config
 from pymongo import MongoClient
 import datetime
 
-from routes.users import users_bp
+from routes.users import users_bp, add_user
 from routes.games import games_bp
 from routes.reviews import reviews_bp
 
@@ -54,10 +54,8 @@ def homePage():
     if 'user' not in session:
         return render_template("index.html")
 
-    username = session["user"]["username"]
-    user = usersCol.find_one({"username": username})
-
-    wishlist = user["profile"].get("wishlist", []) if user else []
+    # get the users profile from the session to check the lists they have
+    wishlist = session['user'].get('profile', {}).get('wishlist', [])
 
     top_games = getTopGames(10)  # Get top 10 games
     return render_template("home.html", games=top_games, wishlist=wishlist)
@@ -119,25 +117,17 @@ def authorized():
     username = email.split('@')[0]
 
     if not user:
-        # create new user if not existant
-        new_user = {
-            "username": username,
-            "email": email,
-            "created_at": datetime.datetime.now()
-        }
-        usersCol.insert_one(new_user)
-
-        # profile page with temp_username
-        return redirect(url_for('users.user_profile'))
+        profile = add_user(username, email)
     else:
+        # get user's username and wishlist items
         username = user['username']
-        wishlist = user['profile'].get('wishlist,', [])
+        profile = user['profile']
 
     # store info in session
     session['user'] = {
         'username': username,
         'email': email,
-        'wishlist': wishlist
+        'profile': profile
     }
 
     # if user exists -> profile page

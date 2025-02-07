@@ -32,7 +32,14 @@
               <div class="rating-container">
                 <p>⭐ {{ game.rating }}</p>
 
-                {% if game.id|string in wishlist %} 💖 {% else %} ❤️ {% endif %}
+                <button
+                  class="wishlist-btn {% if game.id|string in wishlist %}in-wishlist{% endif %}"
+                  onclick="toggleWishlist('{{ game.id }}')"
+                  id="wishlist-{{ game.id }}"
+                >
+                  {% if game.id|string in wishlist %} 💖 {% else %} ❤️ {% endif
+                  %}
+                </button>
               </div>
             </div>
             {% endfor %}
