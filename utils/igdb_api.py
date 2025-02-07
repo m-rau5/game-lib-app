@@ -38,7 +38,7 @@ def getTopGames(n=10, offset=0):
 
             if 'cover' in game:
                 cover_url = game['cover'].get(
-                    'url', 'No cover available.')[2:].replace("thumb", "cover_big")
+                    'url', 'No cover available.').replace("thumb", "cover_big")
             else:
                 cover_url = ''
 
@@ -71,7 +71,7 @@ def getGameById(id):
 
         if 'cover' in game:
             cover_url = game['cover'].get(
-                'url', 'No cover available.')[2:].replace("thumb", "cover_big")
+                'url', 'No cover available.').replace("thumb", "cover_big")
         else:
             cover_url = ''
 
@@ -116,7 +116,7 @@ def searchGame(searchData):
 
             if 'cover' in game:
                 cover_url = game['cover'].get(
-                    'url', 'No cover available.')[2:].replace("thumb", "cover_big")
+                    'url', 'No cover available.').replace("thumb", "cover_big")
             else:
                 cover_url = ''
 
