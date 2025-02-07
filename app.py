@@ -1,4 +1,5 @@
 from flask import Flask, redirect, url_for, session, request, jsonify, render_template
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from authlib.integrations.flask_client import OAuth
 from config import Config
 from pymongo import MongoClient
@@ -13,7 +14,7 @@ from utils.igdb_api import getTopGames
 # App setup
 app = Flask(__name__)
 app.config.from_object(Config)
-
+socketio = SocketIO(app, cors_allowed_origins="*")
 oauth = OAuth(app)
 
 # Google OAuth setup using Authlib
@@ -35,6 +36,39 @@ with app.app_context():
 app.register_blueprint(users_bp, url_prefix='/users')
 app.register_blueprint(games_bp, url_prefix='/games')
 app.register_blueprint(reviews_bp, url_prefix='/reviews')
+
+
+# ------------------------ Socket Handling ------------------------
+
+@socketio.on("connect")
+def handle_connect():
+    if "user" in session:
+        username = session["user"]["username"]
+        socket_id = request.sid  # Unique socket ID
+
+        usersCol.update_one({"username": username}, {
+                            "$set": {"online": True}})
+
+        print(f"{username} connected with socket ID {socket_id}")
+
+        emit("user_status", {"username": username,
+             "online": True}, broadcast=True)
+
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    if "user" in session:
+        username = session["user"]["username"]
+
+        usersCol.update_one({"username": username}, {
+                            "$set": {"online": False}})
+
+        print(f"{username} disconnected")
+
+        emit("user_status", {"username": username,
+             "online": False}, broadcast=True)
+
+# ------------------------ Actual App Routes ------------------------
 
 
 @app.route('/')
@@ -78,11 +112,12 @@ def search():
     elif category == 'games':
         # Search in games collection
 
-        # MAKE API_HELPER TO SEARCH GAME WITH THESE NAMES!!!
+        # Search WIP
+        # foundGames = searchGame(query)
+        foundGames = []
+        wishlist = session['user'].get('profile', {}).get('wishlist', [])
 
-        results = ""
-
-        return render_template('search_results.html', results=results, category='Games')
+        return render_template('search_results.html', games=foundGames, wishlist=wishlist)
 
     else:
         return redirect(url_for('homePage'))
@@ -140,5 +175,36 @@ def logout():
     return redirect(url_for('home'))
 
 
+# ------------------------ Socket Handling ------------------------
+
+@socketio.on("connect")
+def handle_connect():
+    if "user" in session:
+        username = session["user"]["username"]
+        socket_id = request.sid  # Unique socket ID
+
+        usersCol.update_one({"username": username}, {
+                            "$set": {"online": True}})
+
+        print(f"{username} connected with socket ID {socket_id}")
+
+        emit("user_status", {"username": username,
+             "online": True}, broadcast=True)
+
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    if "user" in session:
+        username = session["user"]["username"]
+
+        usersCol.update_one({"username": username}, {
+                            "$set": {"online": False}})
+
+        print(f"{username} disconnected")
+
+        emit("user_status", {"username": username,
+             "online": False}, broadcast=True)
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='localhost', port=5000)

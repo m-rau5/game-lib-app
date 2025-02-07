@@ -53,6 +53,37 @@ def getTopGames(n=10, offset=0):
         return []
 
 
+def getGameById(id):
+    # offset is for pagination -> basically top n games from [offset,n+offset]
+    query = f"""
+    fields name, cover.url, artworks.url, rating, genres.name, storyline;
+    where id = {id};
+    """
+    response = requests.post(IGDB_URL, headers=headers, data=query)
+
+    if response.status_code == 200:
+        game = response.json()[0]
+        formattedData = []
+
+        cover_url = game['cover'].get(
+            'url', 'No cover available.').replace("thumb", "cover_big")
+
+        artwork_url = game['artworks'][0].get(
+            'url', 'No cover available.').replace("thumb", "1080p")
+
+        formattedData.append({
+            "id": game["id"],
+            "name": game["name"],
+            "rating": round(game.get("rating", 0), 1),
+            "genre": game["genres"][0]["name"] if "genres" in game and game["genres"] else "N/A",
+            "cover": f"https:{cover_url}" if cover_url else "No Image",
+            "artwork": f"https:{artwork_url}" if artwork_url else "No Image"
+        })
+        return formattedData[0]
+
+    else:
+        return
+
 # release_date = datetime.utcfromtimestamp(
 # game['first_release_date']).strftime('%d-%m-%Y')
 # print(f"Release Date: {release_date}")

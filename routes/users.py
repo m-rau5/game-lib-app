@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app, render_template, redirect, url_for, session
 from datetime import datetime
 import time
+from utils.igdb_api import getGameById
 
 users_bp = Blueprint('users', __name__)
 db = None
@@ -32,28 +33,35 @@ def add_user(username, email):
     user = {
         "username": username,
         "email": email,
-        "online": False,
         "profile": {
             "currently_playing": [],
             "finished": [],
             "dropped": [],
             "wishlist": []
         },
-        "created_at": datetime.utcnow()
+        "created_at": datetime.utcnow(),
+        "online": False
     }
 
     usersCol.insert_one(user)
     return user.get("profile")
 
 
-# Get user profile by username
+# Get user profile by username - PREVIEW ACCOUNT
+
 @users_bp.route('/<username>', methods=['GET'])
 def get_user(username):
     user = usersCol.find_one({"username": username}, {
         "_id": 0})
     if not user:
         return jsonify({"error": "User not found"}), 404
-    return render_template('user_preview.html', user=user)
+
+    userGames = user['profile'].get('wishlist', [])
+    gameList = []
+    for game in userGames:
+        gameList.append(getGameById(game))
+
+    return render_template('user_preview.html', user=user, games=gameList)
 
 
 @users_bp.route('/user_profile', methods=['GET'])
@@ -68,8 +76,21 @@ def user_profile():
     if session['user']['username'] != username:
         return redirect(url_for('home'))
 
+    # if we already stored them in the session - DEBUG MODE (make sure to set this to [] when updating wishlist!!!)
+    sessionLists = session.get("userFavourites", [])
+    if sessionLists:
+        return render_template('user_profile.html', user=user, games=session['userFavourites'])
+
     if user:
-        return render_template('user_profile.html', user=user)
+        userGames = user['profile'].get('wishlist', [])
+        gameList = []
+        for game in userGames:
+            gameList.append(getGameById(game))
+
+        # game list [[game -> {}],[game -> {}],...] -> list of lists with dicts
+        print(gameList)
+        session['userFavourites'] = gameList
+        return render_template('user_profile.html', user=user, games=gameList)
     else:
         return redirect(url_for('home'))
 
@@ -123,7 +144,9 @@ def update_wishlist():
     # check in wishlist AND in session's wishlist
     wishlist = user["profile"].get("wishlist", [])
     sessionWishlist = session['user'].get('profile', {}).get('wishlist', [])
-    # print(sessionWishlist)
+
+    # reset the user's favourites/wishlist data for the profile
+    session['userFavourites'] = []
 
     if gameId in wishlist:
         # remove from wishlist

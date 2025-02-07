@@ -11,6 +11,7 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='navbar.css') }}"
     />
+    {% include 'socket_t.html' %}
   </head>
   <body>
     <!-- Navigation Bar -->
@@ -33,5 +34,33 @@
         </p>
       </div>
     </div>
+    {% if games|length > 0 %}
+    <div class="profile-container">
+      <h2>Here are some of {{user['username']}}'s favourite games:</h2>
+      <div class="carousel">
+        <div id="game-list" class="carousel-items">
+          {% for game in games %}
+          <div class="game-card" data-game-id="{{ game.id }}">
+            <img src="{{ game.cover }}" alt="{{ game.name }}" />
+            <h3>{{ game.name }}</h3>
+            <p>{{ game.genre }}</p>
+            <div class="rating-container">
+              <p>⭐ {{ game.rating }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="button-div">
+        <button class="carousel-btn left" onclick="scrollToTheLeft()">
+          &#10094;
+        </button>
+        <button class="carousel-btn right" onclick="scrollRight()">
+          &#10095;
+        </button>
+      </div>
+    </div>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/home_scripts.js') }}"></script>
   </body>
 </html>
