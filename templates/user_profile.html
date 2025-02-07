@@ -19,11 +19,7 @@
     <div class="profile-container">
       <div class="profile-header-div">
         <h1>Welcome, {{ user['username'] }}!</h1>
-        <a onclick="openSettingsPopup()">
-          <img
-            src="{{ url_for('static', filename='icons/settings_icon.svg') }}"
-          />
-        </a>
+        <a class="settings-button" onclick="openSettingsPopup()">⚙️</a>
       </div>
       <div class="profile-info">
         <p><strong>Email:</strong> {{ user['email'] }}</p>

@@ -80,6 +80,15 @@ a:hover {
   color: #555;
 }
 
+.settings-button {
+  font-size: 40px;
+  transition: 0.3s;
+}
+
+.settings-button:hover {
+  transform: scale(1.1);
+}
+
 /* Settings popup styling */
 .popup {
   display: none; /* Hidden by default */
