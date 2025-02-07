@@ -2,21 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Library App</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
+      href="{{ url_for('static', filename='login_style.css') }}"
     />
   </head>
   <body>
-    <div class="center-block">
-      <h1>Welcome to Game Library App!</h1>
-      <p>Login with Google to start managing your games!</p>
-      <input
-        type="button"
-        value="Login with Google"
-        onclick="window.location.href = '{{url_for('login')}}'"
-      />
+    <div class="login-container">
+      <div class="login-box">
+        <h1>Game Library App</h1>
+        <p>Login with Google to start managing your games!</p>
+        <button onclick="window.location.href = '{{url_for('login')}}'">
+          <img
+            src="{{ url_for('static', filename='icons/google.png') }}"
+            alt="Google Logo"
+          />
+          Login with Google
+        </button>
+      </div>
     </div>
   </body>
 </html>
