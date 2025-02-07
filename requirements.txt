@@ -10,18 +10,20 @@ click==8.1.8
 colorama==0.4.6
 cryptography==44.0.0
 dnspython==2.7.0
+eventlet==0.39.0
 Flask==3.1.0
 Flask-Dance==7.1.0
 Flask-OAuthlib==0.9.6
 Flask-PyMongo==3.0.1
 Flask-SocketIO==5.5.1
+greenlet==3.1.1
 gunicorn==23.0.0
 h11==0.14.0
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.5
 MarkupSafe==3.0.2
-oauthlib==2.1.0
+oauthlib>   =2.1.0
 packaging==24.2
 pycparser==2.22
 pymongo==4.11
