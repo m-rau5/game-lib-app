@@ -16,6 +16,34 @@
     <!-- Navigation Bar -->
     {% include 'navbar.html' %}
 
-    <div class="home-page-container"></div>
+    <div class="carousel-container">
+      <h2>Best ranked by gamers</h2>
+      <div class="carousel-wrapper">
+        <button class="carousel-btn left" onclick="scrollToTheLeft()">
+          &#10094;
+        </button>
+        <div class="carousel">
+          <div id="game-list" class="carousel-items">
+            {% for game in games %}
+            <div class="game-card" data-game-id="{{ game.id }}">
+              <img src="{{ game.cover }}" alt="{{ game.name }}" />
+              <h3>{{ game.name }}</h3>
+              <p>{{ game.genre }}</p>
+              <div class="rating-container">
+                <p>⭐ {{ game.rating }}</p>
+
+                {% if game.id|string in wishlist %} 💖 {% else %} ❤️ {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <button class="carousel-btn right" onclick="scrollRight()">
+          &#10095;
+        </button>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/home_scripts.js') }}"></script>
   </body>
 </html>

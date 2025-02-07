@@ -19,11 +19,7 @@
   <!-- Profile & Logout Links -->
   <div class="navbar-section navbar-right">
     {% if session.get('user') %}
-    <a
-      href="{{ url_for('users.user_profile', username=session['user']['username']) }}"
-      class="nav-link"
-      >Profile</a
-    >
+    <a href="{{ url_for('users.user_profile') }}" class="nav-link">Profile</a>
     <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
     {% endif %}
   </div>

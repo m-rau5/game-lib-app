@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app, render_template, redirect, url_for, session
 from datetime import datetime
+import time
 
 users_bp = Blueprint('users', __name__)
 db = None
@@ -57,18 +58,15 @@ def get_user(username):
     return render_template('user_preview.html', user=user)
 
 
-@users_bp.route('/user_profile/', methods=['GET'])
-def user_profile(username=None):
+@users_bp.route('/user_profile', methods=['GET'])
+def user_profile():
     if 'user' not in session:
         return redirect(url_for('home'))  # Redirect if not authorized
 
-    # Default to logged-in user's username if none provided
-    if username is None:
-        username = session['user']['username']
-
+    username = session['user']['username']
     user = usersCol.find_one({"username": username})
 
-    # Restrict access to only the logged-in user's profile
+    # restrict access to only the logged-in user's profile
     if session['user']['username'] != username:
         return redirect(url_for('home'))
 
@@ -76,3 +74,30 @@ def user_profile(username=None):
         return render_template('user_profile.html', user=user)
     else:
         return redirect(url_for('home'))
+
+
+@users_bp.route("/user_profile/change_username", methods=["POST"])
+def change_username():
+    if "user" not in session:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+
+    data = request.json
+    newUsername = data.get("new_username")
+    currentUser = session["user"]["username"]
+
+    # empty username
+    if not newUsername:
+        return jsonify({"success": False, "message": "Username cannot be empty"}), 400
+
+    # username exists
+    if usersCol.find_one({"username": newUsername}):
+        return jsonify({"success": False, "message": "Username already taken"}), 400
+
+    # updating the username
+    usersCol.update_one({"username": currentUser}, {
+                        "$set": {"username": newUsername}})
+
+    session["user"]["username"] = newUsername
+    session.modified = True  # force-recognize the session change
+
+    return jsonify({"success": True, "message": "Username updated successfully"})

@@ -8,6 +8,15 @@ body {
   padding: 0;
 }
 
+.profile-header-div {
+  display: grid;
+  grid-template-columns: 3fr 0.3fr;
+  align-items: center;
+  img {
+    width: 70%;
+  }
+}
+
 /* Profile Container Styling */
 .profile-container {
   width: 80%;
@@ -63,4 +72,72 @@ h1 {
 
 .button:hover {
   background-color: #0056b3;
+}
+
+a {
+  color: #333;
+}
+
+a:hover {
+  color: #555;
+}
+
+/* Settings Popup styling */
+.popup {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+  background-color: white;
+  width: 300px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.popup-content h2 {
+  margin-top: 0;
+}
+
+.popup-content input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.popup-content button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.popup-content button:hover {
+  background-color: #0056b3;
+}
+
+/* Close button */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
 }

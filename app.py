@@ -8,6 +8,8 @@ from routes.users import users_bp
 from routes.games import games_bp
 from routes.reviews import reviews_bp
 
+from utils.igdb_api import getTopGames
+
 # App setup
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -40,7 +42,7 @@ def home():
     # if user logged in, go to user's profile
     if 'user' in session:
         return redirect(url_for('users.user_profile'))
-    
+
     # FIX USER IS NOT LOGGED IN AFTER REGISTERING
 
     return render_template("index.html")
@@ -48,7 +50,17 @@ def home():
 
 @app.route('/home')
 def homePage():
-    return render_template("home.html")
+
+    if 'user' not in session:
+        return render_template("index.html")
+
+    username = session["user"]["username"]
+    user = usersCol.find_one({"username": username})
+
+    wishlist = user["profile"].get("wishlist", []) if user else []
+
+    top_games = getTopGames(10)  # Get top 10 games
+    return render_template("home.html", games=top_games, wishlist=wishlist)
 
 
 @app.route('/search', methods=['GET'])
@@ -80,11 +92,10 @@ def search():
 
 @app.route('/login')
 def login():
-    # Redirect to Google's login page
+    # redirect to Google's login page
     try:
         redirUri = url_for('authorized', _external=True)
-        redirUri = redirUri.replace('127.0.0.1', 'localhost')
-        # Generate state and save it in the session
+        # generate state and save it in the session
         print(redirUri)
         return google.authorize_redirect(redirUri)
     except Exception as e:
@@ -120,11 +131,13 @@ def authorized():
         return redirect(url_for('users.user_profile'))
     else:
         username = user['username']
+        wishlist = user['profile'].get('wishlist,', [])
 
     # store info in session
     session['user'] = {
         'username': username,
-        'email': email
+        'email': email,
+        'wishlist': wishlist
     }
 
     # if user exists -> profile page
