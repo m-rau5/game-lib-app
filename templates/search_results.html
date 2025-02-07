@@ -14,8 +14,48 @@
   </head>
   <body>
     <!-- Navigation Bar -->
-    {% include 'navbar.html' %}
+    {% include 'navbar.html' %} {% if games|length > 0 %}
+    <div class="carousel-container">
+      <h2>Search Results for {{ games['name'] }}</h2>
+      <div class="carousel-wrapper">
+        <button class="carousel-btn left" onclick="scrollToTheLeft(600)">
+          &#10094;
+        </button>
+        <div class="carousel">
+          <div id="game-list" class="carousel-items">
+            {% for game in games %}
+            <div class="game-card" data-game-id="{{ game.id }}">
+              <img src="{{ game.cover }}" alt="{{ game.name }}" />
+              <h3>{{ game.name }}</h3>
+              <p>{{ game.genre }}</p>
+              <div class="rating-container">
+                <p>⭐ {{ game.rating }}</p>
 
-    <div class="home-page-container"></div>
+                <button
+                  class="wishlist-btn {% if game.id|string in wishlist %}in-wishlist{% endif %}"
+                  onclick="toggleWishlist('{{ game.id }}')"
+                  id="wishlist-{{ game.id }}"
+                >
+                  {% if game.id|string in wishlist %} 💖 {% else %} ❤️ {% endif
+                  %}
+                </button>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <button class="carousel-btn right" onclick="scrollRight(600)">
+          &#10095;
+        </button>
+      </div>
+    </div>
+    {% else %}
+    <div class="carousel-container">
+      <h2>No Results for "{{ gName }}" in {{ category }}.</h2>
+    </div>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/home_scripts.js') }}"></script>
+    {% include 'socket_t.html' %}
   </body>
 </html>

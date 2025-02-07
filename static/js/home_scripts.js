@@ -1,16 +1,16 @@
 const carousel = document.querySelector(".carousel-items");
 
 // Carousel Scroll Functions
-function scrollToTheLeft() {
+function scrollToTheLeft(scrollAmount = 500) {
   document
     .querySelector(".carousel")
-    .scrollBy({ left: -220, behavior: "smooth" });
+    .scrollBy({ left: -scrollAmount, behavior: "smooth" });
 }
 
-function scrollRight() {
+function scrollRight(scrollAmount = 500) {
   document
     .querySelector(".carousel")
-    .scrollBy({ left: 220, behavior: "smooth" });
+    .scrollBy({ left: scrollAmount, behavior: "smooth" });
 }
 
 // handle the wishlist

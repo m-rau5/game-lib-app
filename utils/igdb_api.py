@@ -33,10 +33,14 @@ def getTopGames(n=10, offset=0):
         formattedData = []
         for game in games:
             """
-            Structure of data is like: game[''] - name,rating,genre, cover{'url':...}, 
+            Structure of data is like: game[''] - name,rating,genre, cover{'url':...},
             """
-            cover_url = game['cover'].get(
-                'url', 'No cover available.')[2:].replace("thumb", "cover_big")
+
+            if 'cover' in game:
+                cover_url = game['cover'].get(
+                    'url', 'No cover available.')[2:].replace("thumb", "cover_big")
+            else:
+                cover_url = ''
 
             formattedData.append({
                 "id": game["id"],
@@ -65,11 +69,17 @@ def getGameById(id):
         game = response.json()[0]
         formattedData = []
 
-        cover_url = game['cover'].get(
-            'url', 'No cover available.').replace("thumb", "cover_big")
+        if 'cover' in game:
+            cover_url = game['cover'].get(
+                'url', 'No cover available.')[2:].replace("thumb", "cover_big")
+        else:
+            cover_url = ''
 
-        artwork_url = game['artworks'][0].get(
-            'url', 'No cover available.').replace("thumb", "1080p")
+        if 'artworks' in game:
+            artwork_url = game['artworks'][0].get(
+                'url', 'No cover available.').replace("thumb", "1080p")
+        else:
+            artwork_url = ''
 
         formattedData.append({
             "id": game["id"],
@@ -83,6 +93,44 @@ def getGameById(id):
 
     else:
         return
+
+
+def searchGame(searchData):
+    # offset is for pagination -> basically top n games from [offset,n+offset]
+    print(searchData)
+    query = f'''
+    fields id, name, cover.url, rating, genres.name;
+    where name ~ "{str(searchData)}"*;
+    sort rating desc; 
+    limit 15;
+    '''
+    response = requests.post(IGDB_URL, headers=headers, data=query)
+
+    if response.status_code == 200:
+        games = response.json()
+        formattedData = []
+        for game in games:
+            """
+            Structure of data is like: game[''] - name,rating,genre, cover{'url':...}, 
+            """
+
+            if 'cover' in game:
+                cover_url = game['cover'].get(
+                    'url', 'No cover available.')[2:].replace("thumb", "cover_big")
+            else:
+                cover_url = ''
+
+            formattedData.append({
+                "id": game["id"],
+                "name": game["name"],
+                "rating": round(game.get("rating", 0), 1),
+                "genre": game["genres"][0]["name"] if "genres" in game and game["genres"] else "N/A",
+                "cover": f"https:{cover_url}" if cover_url else "No Image"
+            })
+        return formattedData
+    else:
+        print(response)
+        return []
 
 # release_date = datetime.utcfromtimestamp(
 # game['first_release_date']).strftime('%d-%m-%Y')

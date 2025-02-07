@@ -9,7 +9,7 @@ from routes.users import users_bp, add_user
 from routes.games import games_bp
 from routes.reviews import reviews_bp
 
-from utils.igdb_api import getTopGames
+from utils.igdb_api import getTopGames, searchGame
 
 # App setup
 app = Flask(__name__)
@@ -107,17 +107,15 @@ def search():
 
         if user:
             return redirect(url_for('users.get_user', username=user['username']))
-        return render_template('search_results.html', results="", category='Users')
+        return render_template('search_results.html', results="", category='users', gName=query)
 
     elif category == 'games':
         # Search in games collection
 
-        # Search WIP
-        # foundGames = searchGame(query)
-        foundGames = []
+        foundGames = searchGame(query)
         wishlist = session['user'].get('profile', {}).get('wishlist', [])
 
-        return render_template('search_results.html', games=foundGames, wishlist=wishlist)
+        return render_template('search_results.html', games=foundGames, category='games', wishlist=wishlist, gName=query)
 
     else:
         return redirect(url_for('homePage'))
