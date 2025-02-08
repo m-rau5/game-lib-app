@@ -12,3 +12,7 @@ socket.on("user_status", (data) => {
     `User ${data.username} is now ${data.online ? "online" : "offline"}`
   );
 });
+
+function forceDisc() {
+  socket.disconnect();
+}

@@ -16,7 +16,7 @@
     <!-- Navigation Bar -->
     {% include 'navbar.html' %} {% if games|length > 0 %}
     <div class="carousel-container">
-      <h2>Search Results for {{ games['name'] }}</h2>
+      <h2>Search Results for "{{ gName }}".</h2>
       <div class="carousel-wrapper">
         <button class="carousel-btn left" onclick="scrollToTheLeft(600)">
           &#10094;
